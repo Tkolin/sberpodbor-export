@@ -1,0 +1,17 @@
+[
+  {
+    "email": "account1@example.com",
+    "password": "password1",
+    "proxy": null
+  },
+  {
+    "email": "account2@example.com",
+    "password": "password2",
+    "proxy": "http://user:pass@proxy-host-2:8080"
+  },
+  {
+    "email": "account3@example.com",
+    "password": "password3",
+    "proxy": "http://user:pass@proxy-host-3:8080"
+  }
+]

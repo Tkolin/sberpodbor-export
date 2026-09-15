@@ -1,0 +1,14 @@
+{
+  "name": "sberpodbor-export",
+  "version": "2.0.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "Resumable multi-account/multi-proxy exporter of the СберПодбор ATS (api.sberpodbor.ru) into SQLite",
+  "scripts": {
+    "start": "node export.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "undici": "^6.28.0"
+  }
+}
