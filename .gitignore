@@ -1,13 +1,34 @@
 # secrets — never commit
 accounts.json
+.env
+.env.*
+!.env.example
+nginx/certs/
+*.pem
+*.key
 
-# data
+# data (personal data — never commit)
 *.db
 *.db-wal
 *.db-shm
+media/
+backups/
+exports/
 
 # logs
 *.log
 
-# deps
+# deps / build output
 node_modules/
+__pycache__/
+*.pyc
+.venv/
+.nuxt/
+.output/
+.data/
+
+# local scratch
+export.js.bak*
+tmp-vps.sh
+.claude/
+.serena/

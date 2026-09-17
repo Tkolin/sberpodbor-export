@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="urn:sberpodbor:export:1.0"
+           targetNamespace="urn:sberpodbor:export:1.0"
+           elementFormDefault="qualified">
+
+  <xs:annotation>
+    <xs:documentation xml:lang="ru">
+      Схема выгрузки базы Сбер Подбора. Корень содержит справочники (вакансии,
+      пользователи ATS) и список профилей; заявки, логи и комментарии вложены
+      в профиль, к которому относятся.
+
+      Пустая строка в текстовом узле означает "поле отсутствует в источнике" —
+      элементы firstName/lastName/phone/email/city выводятся всегда, даже пустыми,
+      чтобы позиционный разбор не сбивался.
+    </xs:documentation>
+  </xs:annotation>
+
+  <!-- ── общие типы ─────────────────────────────────────────────────────── -->
+  <xs:complexType name="Person">
+    <xs:attribute name="id" type="xs:long"/>
+    <xs:attribute name="firstName" type="xs:string"/>
+    <xs:attribute name="lastName" type="xs:string"/>
+    <xs:attribute name="middleName" type="xs:string"/>
+    <xs:attribute name="position" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="PersonList">
+    <xs:sequence>
+      <xs:element name="person" type="Person" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Vacancy">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="id" type="xs:long" use="required"/>
+        <xs:attribute name="status" type="xs:string"/>
+        <xs:attribute name="city" type="xs:string"/>
+        <xs:attribute name="personsCount" type="xs:int"/>
+        <xs:attribute name="createdAt" type="xs:dateTime"/>
+        <xs:attribute name="desiredClosingAt" type="xs:dateTime"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="AtsUser">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="id" type="xs:long" use="required"/>
+        <xs:attribute name="role" type="xs:string"/>
+        <xs:attribute name="status" type="xs:string"/>
+        <xs:attribute name="email" type="xs:string"/>
+        <xs:attribute name="position" type="xs:string"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="Contact">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="id" type="xs:long" use="required"/>
+        <xs:attribute name="type" type="xs:string"/>
+        <xs:attribute name="isMain" type="xs:boolean"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="MediaRef">
+    <xs:annotation>
+      <xs:documentation xml:lang="ru">
+        Ссылка на исходный файл в Сбер Подборе. mediaId — идентификатор локальной копии:
+        файл доступен в панели по адресу /api/media/{mediaId}/file.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="xs:anyURI">
+        <xs:attribute name="mediaId" type="xs:long" use="required"/>
+        <xs:attribute name="contentType" type="xs:string"/>
+        <xs:attribute name="bytes" type="xs:long"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="Resume">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="source" type="xs:string"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="LogEntry">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="id" type="xs:long" use="required"/>
+        <xs:attribute name="at" type="xs:dateTime"/>
+        <xs:attribute name="author" type="xs:string"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="Comment">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="id" type="xs:long" use="required"/>
+        <xs:attribute name="createdAt" type="xs:dateTime"/>
+        <xs:attribute name="changedAt" type="xs:dateTime"/>
+        <xs:attribute name="authorId" type="xs:long"/>
+        <xs:attribute name="author" type="xs:string"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="Application">
+    <xs:sequence>
+      <xs:element name="recruiters" type="PersonList" minOccurs="0"/>
+      <xs:element name="managers" type="PersonList" minOccurs="0"/>
+      <xs:element name="logs" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="log" type="LogEntry" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="comments" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="comment" type="Comment" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="candidateId" type="xs:long" use="required"/>
+    <xs:attribute name="vacancyId" type="xs:long"/>
+    <xs:attribute name="vacancyTitle" type="xs:string"/>
+    <xs:attribute name="statusId" type="xs:int"/>
+    <xs:attribute name="statusTitle" type="xs:string"/>
+    <xs:attribute name="createdAt" type="xs:dateTime"/>
+  </xs:complexType>
+
+  <xs:complexType name="CurrentWork">
+    <xs:attribute name="position" type="xs:string"/>
+    <xs:attribute name="company" type="xs:string"/>
+    <xs:attribute name="experience" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="Profile">
+    <xs:sequence>
+      <xs:element name="firstName" type="xs:string"/>
+      <xs:element name="lastName" type="xs:string"/>
+      <xs:element name="middleName" type="xs:string"/>
+      <xs:element name="phone" type="xs:string"/>
+      <xs:element name="email" type="xs:string"/>
+      <xs:element name="city" type="xs:string"/>
+      <xs:element name="currentWork" type="CurrentWork"/>
+      <xs:element name="contacts" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="contact" type="Contact" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="files" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="photo" type="MediaRef" minOccurs="0"/>
+            <xs:element name="resumeFile" type="MediaRef" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="resume" type="Resume" minOccurs="0"/>
+      <xs:element name="applications" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="application" type="Application" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:long" use="required"/>
+  </xs:complexType>
+
+  <!-- ── корень ─────────────────────────────────────────────────────────── -->
+  <xs:element name="sberpodborExport">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="vacancies" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="vacancy" type="Vacancy" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="users" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="user" type="AtsUser" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="profiles">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="profile" type="Profile" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:string" use="required"/>
+      <xs:attribute name="generatedAt" type="xs:dateTime" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

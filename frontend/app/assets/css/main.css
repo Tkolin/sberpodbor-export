@@ -1,0 +1,40 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+/* Chart palette — slots 1-2 of the validated categorical theme.
+   Verified with the palette validator in both modes: lightness band, chroma floor,
+   CVD separation (ΔE 24.7 light / 26.8 dark), normal-vision floor, contrast ≥3:1.
+   Dark is its own set of steps for the dark surface, not an automatic flip. */
+.viz-root {
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --viz-grid: rgb(0 0 0 / 0.08);
+  --viz-surface: #fcfcfb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) .viz-root {
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --viz-grid: rgb(255 255 255 / 0.10);
+    --viz-surface: #1a1a19;
+  }
+}
+
+:root[data-theme="dark"] .viz-root {
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --viz-grid: rgb(255 255 255 / 0.10);
+  --viz-surface: #1a1a19;
+}
+
+/* Recessive axes and grid: the data, not the scaffolding, carries the ink. */
+.viz-root .vis-axis-grid-line line,
+.viz-root .vis-axis-domain-line {
+  stroke: var(--viz-grid);
+}
+.viz-root .vis-axis-tick-label,
+.viz-root .vis-axis-label {
+  fill: var(--ui-text-muted);
+  font-size: 11px;
+}

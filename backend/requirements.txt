@@ -1,0 +1,17 @@
+fastapi==0.118.0
+uvicorn[standard]==0.37.0
+sqlalchemy[asyncio]==2.0.44
+asyncpg==0.30.0
+alembic==1.16.5
+pydantic==2.12.0
+email-validator==2.3.0   # required by pydantic EmailStr
+pydantic-settings==2.11.0
+httpx[http2,socks]==0.28.1
+cryptography==46.0.1
+passlib[bcrypt]==1.7.4
+bcrypt==4.3.0
+pyjwt==2.10.1
+python-multipart==0.0.20
+lxml==6.0.2
+openpyxl==3.1.5          # Excel sample export
+apscheduler==3.11.0
